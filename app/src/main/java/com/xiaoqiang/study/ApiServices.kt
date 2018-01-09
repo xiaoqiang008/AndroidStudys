@@ -19,6 +19,9 @@ interface ApiServices{
     @GET("test1/login")
     fun loginUser() : Observable<HttpResponse<Int>>
 
+    @GET("test1/logins")
+    fun loginUsers() : Observable<HttpResponse<Int>>
+
     /*大文件需要加入这个判断，防止下载过程中写入到内存中*/
     @GET("test1/DownloadFile?fileName=test.rar")
     @Streaming
