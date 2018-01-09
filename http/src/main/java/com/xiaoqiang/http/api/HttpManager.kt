@@ -42,7 +42,7 @@ object HttpManager{
         Log.i("HttpManager","HttpManager init")
     }
 
-    fun <T> setBaseApi(observable: Observable<T>, httpSubscriber: Observer<T>, int: Int = 3){
+    fun <T> setBaseApi(observable: Observable<T>, httpSubscriber: Observer<T>, int: Int = 3, delayTime: Long = 10000){
         Log.i("HttpManager","setBaseApi")
         var cout = 0
         observable
@@ -63,10 +63,10 @@ object HttpManager{
                                 Log.i("HttpManager", "throwableObservable:$cout")
 //                                observable.repeat(30000)
                                 if(int == -1){
-                                    Observable.timer(1, TimeUnit.SECONDS)
+                                    Observable.timer(delayTime, TimeUnit.MILLISECONDS)
                                 }else if(cout < int) {
                                     cout ++
-                                    Observable.timer(1, TimeUnit.SECONDS)
+                                    Observable.timer(delayTime, TimeUnit.MILLISECONDS)
                                 }else{
                                     Observable.error<Function<Throwable, ObservableSource<*>>>(Throwable("retryWhen终止啦"))
                                 }
