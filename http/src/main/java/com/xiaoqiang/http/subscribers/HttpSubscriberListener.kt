@@ -15,7 +15,7 @@ interface HttpSubscriberListener<T> : Observer<T> {
 //    private val TAG = "HttpSubscriberListener"
     override fun onSubscribe(d: Disposable) {
 //        Log.i(TAG,"onSubscribe")
-        requestSubscribe(d)
+//        requestSubscribe(d)
     }
     override fun onNext(t: T) {
 //        Log.i(TAG,"onNext:"+t)
@@ -28,12 +28,12 @@ interface HttpSubscriberListener<T> : Observer<T> {
 
     override fun onComplete() {
 //        Log.i(TAG,"onComplete")
-        requestComplete()
+//        requestComplete()
     }
 
 
-    fun requestSubscribe(d: Disposable)
+//    fun requestSubscribe(d: Disposable)
     fun requestSuccee(t : T)
     fun requestFail(e : ApiException)
-    fun requestComplete()
+//    fun requestComplete()
 }

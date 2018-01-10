@@ -49,9 +49,6 @@ var baseUrl = "http://192.168.0.48:8080/"
         Log.i("HttpManager","HttpManager init   sssss")
         HttpManager.setBaseApi(http!!.loginUser(),object : HttpSubscriberListener<HttpResponse<Int>>{
             val TAG = "object"
-            override fun requestSubscribe(d: Disposable) {
-                Log.i(TAG,"requestSubscribe")
-            }
 
             override fun requestSuccee(t: HttpResponse<Int>) {
                 Log.i(TAG,"requestSuccee："+Gson().toJson(t))
@@ -61,9 +58,6 @@ var baseUrl = "http://192.168.0.48:8080/"
                 Log.i(TAG,"requestFail")
             }
 
-            override fun requestComplete() {
-                Log.i(TAG,"requestComplete")
-            }
         },10)
     }
 
@@ -71,9 +65,9 @@ var baseUrl = "http://192.168.0.48:8080/"
         Log.i("HttpManager","HttpManager init   sssss")
         HttpManager.setBaseApi(http!!.loginUser(),object : HttpSubscriberListener<HttpResponse<Int>>{
             val TAG = "object"
-            override fun requestSubscribe(d: Disposable) {
-                Log.i(TAG,"requestSubscribe")
-            }
+//            override fun requestSubscribe(d: Disposable) {
+//                Log.i(TAG,"requestSubscribe")
+//            }
 
             override fun requestSuccee(t: HttpResponse<Int>) {
                 Log.i(TAG,"requestSuccee："+Gson().toJson(t))
@@ -83,9 +77,9 @@ var baseUrl = "http://192.168.0.48:8080/"
                 Log.i(TAG,"requestFail")
             }
 
-            override fun requestComplete() {
-                Log.i(TAG,"requestComplete")
-            }
+//            override fun requestComplete() {
+//                Log.i(TAG,"requestComplete")
+//            }
         },-1)
     }
     val TAG = "Test"
