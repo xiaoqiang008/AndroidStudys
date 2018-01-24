@@ -1,98 +1,76 @@
 package com.xiaoqiang.http.api
 
 import android.util.Log
-import com.google.gson.Gson
-import com.xiaoqiang.http.exception.RetryWhenNetworkException
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.functions.BiFunction
 import io.reactivex.functions.Function
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.experimental.delay
-import kotlinx.coroutines.experimental.launch
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.Retrofit
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import rx.functions.Func1
-import rx.functions.Func2
 import java.io.IOException
 import java.io.InputStream
-import java.net.ConnectException
-import java.net.SocketTimeoutException
 import java.security.KeyStore
 import java.security.SecureRandom
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
-import java.sql.Time
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeoutException
 import javax.net.ssl.*
 
 /**
- * Created by admin3 on 2017/11/29.
+ * Created by admin3 on 2018/1/18.
  */
-object HttpManager{
+class HttpDynamicManager {
 
-    private var client : Retrofit? = null
+    private var client: Retrofit? = null
 
     init {
-        Log.i("HttpManager","HttpManager init")
+        Log.i("HttpManager", "HttpManager init")
     }
 
-    fun <T> setBaseApi(observable: Observable<T>, httpSubscriber: Observer<T>, int: Int = 3, delayTime: Long = 10000){
-        Log.i("HttpManager","setBaseApi")
+    fun <T> setBaseApi(observable: Observable<T>, httpSubscriber: Observer<T>, int: Int = 3, delayTime: Long = 10000) {
+        Log.i("HttpManager", "setBaseApi")
         var cout = 0
         observable
                 /*http请求线程*/
-                .retryWhen{ throwableObservable ->
+//                .retryWhen {
+//                    throwableObservable ->
+//
+//                    throwableObservable.zipWith(Observable.range(1, count + 1))
+//                    Log.i("HttpManager","throwableObservable")
+//                    Observable.interval(3000, TimeUnit.SECONDS).take(3)
+//                }
+                .retryWhen { throwableObservable ->
                     throwableObservable
                             .subscribeOn(Schedulers.io())
                             .flatMap(Function<Throwable, ObservableSource<*>> {
+                                //                                observable.repeat()
                                 //如果发射的onError就终止
                                 Log.i("HttpManager", "throwableObservable:$cout")
-                                if(int == -1){
+//                                observable.repeat(30000)
+                                if (int == -1) {
                                     Observable.timer(delayTime, TimeUnit.MILLISECONDS)
-                                }else if(cout < int) {
-                                    cout ++
+                                } else if (cout < int) {
+                                    cout++
                                     Observable.timer(delayTime, TimeUnit.MILLISECONDS)
-                                }else{
-                                    Observable.error<Function<Throwable, ObservableSource<*>>>(Throwable("retryWhen终止啦"))
+                                } else {
+                                    Observable.error<io.reactivex.functions.Function<Throwable, ObservableSource<*>>>(Throwable("retryWhen终止啦"))
                                 }
-                }) }
-                .subscribeOn(Schedulers.io())
-                .unsubscribeOn(Schedulers.io())
-                /*回调线程*/
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(httpSubscriber)
 
-    }
-
-    fun <T> setBaseApi(observable: Observable<T>, httpSubscriber: Observer<T>, int: Int = 3, delayTime: Long = 10000,errorBack:(Int) -> Unit){
-        Log.i("HttpManager","setBaseApi")
-        var cout = 0
-        observable
-                /*http请求线程*/
-                .retryWhen{ throwableObservable ->
-                    throwableObservable
-                            .subscribeOn(Schedulers.io())
-                            .flatMap(Function<Throwable, ObservableSource<*>> {
-                                //如果发射的onError就终止
-                                Log.i("HttpManager", "throwableObservable:$cout")
-                                if(int == -1){
-                                    errorBack(-1)
-                                    Observable.timer(delayTime, TimeUnit.MILLISECONDS)
-                                }else if(cout < int) {
-                                    errorBack(cout)
-                                    cout ++
-                                    Observable.timer(delayTime, TimeUnit.MILLISECONDS)
-                                }else{
-                                    Observable.error<Function<Throwable, ObservableSource<*>>>(Throwable("retryWhen终止啦"))
-                                }
-                            }) }
+//                                observable.zipWith(Observable.range(1,2),{t,t2->})
+//                                Observable.zip(firstRequest, secondRequest, new BiFunction<FirstBean, SecondBean, WholeBean>() {
+//                                    @Override
+//                                    public WholeBean apply(@NonNull FirstBean firstBean, @NonNull SecondBean secondBean) throws Exception {
+//                                        //结合数据为一体
+//                                    }
+//                                });
+//                    Observable.error<Function<Throwable, ObservableSource<*>>>(Throwable("retryWhen终止啦"))
+                            })
+                }
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 /*回调线程*/
@@ -103,12 +81,12 @@ object HttpManager{
 
     class Wrapper(private val throwable: Throwable, private val index: Int)
 
-    fun <T> getApiService(service : Class<T> ) : T?{
+    fun <T> getApiService(service: Class<T>): T? {
         return client?.create(service)
     }
 
-    fun httpInit(baseUrl : String, connectTimeout : Long, vararg certificates : InputStream) : Retrofit{
-        Log.i("HttpManager","HttpManager init")
+    fun httpInit(baseUrl: String, connectTimeout: Long, vararg certificates: InputStream): Retrofit {
+        Log.i("HttpManager", "HttpManager init")
         val httpLoggingInterceptor = HttpLoggingInterceptor()
         httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
         val okHttpClients = OkHttpClient.Builder()
@@ -116,24 +94,37 @@ object HttpManager{
                 .connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
                 .writeTimeout(connectTimeout, TimeUnit.MILLISECONDS)
                 .readTimeout(connectTimeout, TimeUnit.MILLISECONDS)
-                if(certificates.size > 0) {
-                    okHttpClients.sslSocketFactory(createSSLSocketFactory(*certificates), TrustAllManager())
-                            .hostnameVerifier(TrustAllHostnameVerifier())
-                }
+        if (certificates.size > 0) {
+            okHttpClients.sslSocketFactory(createSSLSocketFactory(*certificates), TrustAllManager())
+                    .hostnameVerifier(TrustAllHostnameVerifier())
+        }
+//        ,object : X509TrustManager{
+//            override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) {
+//                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+//            }
+//
+//            override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) {
+//                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+//            }
+//
+//            override fun getAcceptedIssuers(): Array<X509Certificate> {
+//                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+//            }
+//        }
 
-         client = Retrofit.Builder()
+        client = Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .client(okHttpClients.build())
-                .addConverterFactory(GsonConverterFactory.create(Gson()))
+                .addConverterFactory(GsonConverterFactory.create())
+//                .addConverterFactory(ResponseConverterFactory<T>(Gson()))
+//                .addConverterFactory(CustomGsonConverterFactory.Companion.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build()
         return client!!
     }
 
 
-
-
-    fun createSSLSocketFactory() : SSLSocketFactory?{
+    fun createSSLSocketFactory(): SSLSocketFactory? {
         var sSLSocketFactory: SSLSocketFactory? = null
 
         try {
@@ -148,7 +139,7 @@ object HttpManager{
         return sSLSocketFactory
     }
 
-    fun createSSLSocketFactory(vararg certificates : InputStream) : SSLSocketFactory?{
+    fun createSSLSocketFactory(vararg certificates: InputStream): SSLSocketFactory? {
         try {
             val certificateFactory = CertificateFactory.getInstance("X.509")
             val keyStore = KeyStore.getInstance(KeyStore.getDefaultType())
@@ -177,7 +168,7 @@ object HttpManager{
                     SecureRandom()
             )
 
-            return  sslContext.getSocketFactory()
+            return sslContext.getSocketFactory()
         } catch (e: Exception) {
             e.printStackTrace()
             return null
@@ -198,7 +189,7 @@ object HttpManager{
 
     private class TrustAllHostnameVerifier : HostnameVerifier {
 
-         override fun verify(hostname: String, session: SSLSession): Boolean {
+        override fun verify(hostname: String, session: SSLSession): Boolean {
             return true
         }
     }
