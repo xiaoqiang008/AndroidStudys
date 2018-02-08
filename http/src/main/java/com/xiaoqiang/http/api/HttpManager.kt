@@ -38,6 +38,7 @@ import javax.net.ssl.*
 object HttpManager{
 
     private var client : Retrofit? = null
+    private var logBack: LogBack? = null
 
     init {
         Log.i("HttpManager","HttpManager init")
@@ -71,7 +72,7 @@ object HttpManager{
 
     }
 
-    fun <T> setBaseApi(observable: Observable<T>, httpSubscriber: Observer<T>, int: Int = 3, delayTime: Long = 10000,errorBack:(Int) -> Unit){
+    fun <T> setBaseApis(observable: Observable<T>, httpSubscriber: Observer<T>, int: Int = 3, delayTime: Long = 10000,errorBack:(Int) -> Unit){
         Log.i("HttpManager","setBaseApi")
         var cout = 0
         observable
@@ -107,9 +108,10 @@ object HttpManager{
         return client?.create(service)
     }
 
-    fun httpInit(baseUrl : String, connectTimeout : Long, vararg certificates : InputStream) : Retrofit{
+    fun httpInit(baseUrl : String, connectTimeout : Long, logBack: LogBack? = null, vararg certificates : InputStream) : Retrofit{
         Log.i("HttpManager","HttpManager init")
-        val httpLoggingInterceptor = HttpLoggingInterceptor()
+        this.logBack = logBack
+        val httpLoggingInterceptor = HttpLoggingInterceptor(HttpLogger())
         httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
         val okHttpClients = OkHttpClient.Builder()
                 .addInterceptor(httpLoggingInterceptor)
@@ -215,5 +217,17 @@ object HttpManager{
         val loggingInterceptor = HttpLoggingInterceptor(HttpLoggingInterceptor.Logger { message -> Log.d("RxRetrofit", "Retrofit====Message:" + message) })
         loggingInterceptor.level = level
         return loggingInterceptor
+    }
+
+    interface LogBack{
+        fun log(message: String)
+    }
+
+    class HttpLogger : HttpLoggingInterceptor.Logger {
+
+        override fun log(message: String) {
+            if(logBack != null)
+                logBack?.log(message)
+        }
     }
 }
