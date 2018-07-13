@@ -2,6 +2,7 @@ package com.xiaoqiang.study
 
 
 import io.reactivex.Observable
+import okhttp3.MultipartBody
 import okhttp3.Response
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -31,4 +32,9 @@ interface ApiServices{
     @GET()
     @Streaming
     fun downloadFiles(@Url url : String) : Observable<ResponseBody>
+
+    /*大文件需要加入这个判断，防止下载过程中写入到内存中*/
+    @POST()
+    @Multipart
+    fun uplodFiles(@Url url : String, @Part file: MultipartBody.Part) : Observable<ResponseBody>
 }

@@ -11,8 +11,19 @@ import com.google.gson.JsonObject
 import com.xiaoqiang.http.progress.DownFileInfo
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_main.*
+import okhttp3.MediaType
 import org.jetbrains.anko.toast
 import org.json.JSONObject
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import okhttp3.ResponseBody
+import okio.BufferedSource
+import java.io.File
+import java.math.BigDecimal
+import java.text.DecimalFormat
+
+
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -70,6 +81,17 @@ class MainActivity : AppCompatActivity() {
 //            test.pause(downFileInfo1)
             test.test1()
         })
+        val dirPath = filesDir.absolutePath+"/2018_02_26_logs.txt"
+        Log.i("main","dirPath:$dirPath")
+
+        val file = File(dirPath)
+        val requestBody = RequestBody.create(MediaType.parse("text/x-markdown; charset=utf-8"), file)
+        val part = MultipartBody.Part.createFormData("filename", file.getName(), requestBody)
+
+
+        stops.setOnClickListener({
+            test.test22("http://api.school.jxjt.me/device/uploadLog",part)
+        })
 
         val list = mutableMapOf<String,String>()
         list.put("device_id","HJKKJJYHYHGBGH")
@@ -81,7 +103,9 @@ class MainActivity : AppCompatActivity() {
         jsonobject.put("finger_device_id",556565235555)
 
         Log.i("Test", jsonobject.toString())
-
+        val df = DecimalFormat("######0.00")
+        val ss1 = df.format(BigDecimal(2).setScale(2, BigDecimal.ROUND_HALF_UP).toDouble())
+        Log.i("main","ss1:$ss1")
         //        String filename = getFilesDir().getAbsolutePath() + "/test1.gz";
         //        String url = "http://192.168.0.155:8080/test1/DownloadFile?fileName=test.gz";
 

@@ -111,7 +111,12 @@ object HttpManager{
     fun httpInit(baseUrl : String, connectTimeout : Long, logBack: LogBack? = null, vararg certificates : InputStream) : Retrofit{
         Log.i("HttpManager","HttpManager init")
         this.logBack = logBack
-        val httpLoggingInterceptor = HttpLoggingInterceptor(HttpLogger())
+        var httpLoggingInterceptor: HttpLoggingInterceptor? = null
+        if(logBack != null) {
+            httpLoggingInterceptor = HttpLoggingInterceptor(HttpLogger())
+        }else{
+            httpLoggingInterceptor = HttpLoggingInterceptor()
+        }
         httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
         val okHttpClients = OkHttpClient.Builder()
                 .addInterceptor(httpLoggingInterceptor)

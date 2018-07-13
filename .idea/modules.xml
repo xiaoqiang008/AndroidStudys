@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/AndroidStudys.iml" filepath="$PROJECT_DIR$/AndroidStudys.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/http/http.iml" filepath="$PROJECT_DIR$/http/http.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sql/sql.iml" filepath="$PROJECT_DIR$/sql/sql.iml" />
     </modules>
   </component>
 </project>

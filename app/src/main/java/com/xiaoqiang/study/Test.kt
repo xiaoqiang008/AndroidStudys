@@ -6,6 +6,7 @@ import android.widget.TextView
 import com.google.gson.Gson
 import com.xiaoqiang.http.api.HttpDownManager
 import com.xiaoqiang.http.api.HttpManager
+import com.xiaoqiang.http.api.HttpUploadManager
 import com.xiaoqiang.http.exception.ApiException
 import com.xiaoqiang.http.exception.RetryWhenNetworkException
 import com.xiaoqiang.http.progress.DownFileInfo
@@ -14,6 +15,7 @@ import com.xiaoqiang.http.subscribers.HttpSubscribers
 import io.reactivex.ObservableSource
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Function
+import okhttp3.MultipartBody
 import okhttp3.ResponseBody
 import org.jetbrains.anko.runOnUiThread
 import rx.Observable
@@ -32,9 +34,11 @@ import javax.security.cert.X509Certificate
 class Test(var context: Context){
 //    var baseUrl = "http://10.0.2.2:8080/"
 //    var baseUrl = "https://192.168.0.48:8443/"
-var baseUrl = "http://192.168.0.48:8080/"
+var baseUrl = "http://api.school.jxjt.me"
     var apiServices: ApiServices
     var http : ApiServices?
+
+    var httpUpload : ApiServices?
 
     init {
 //        HttpManager.httpInit(baseUrl,10000,context.getAssets().open("tomcat.cer"))
@@ -43,6 +47,9 @@ var baseUrl = "http://192.168.0.48:8080/"
 
         var retrofit =  HttpDownManager.httpInit(baseUrl,600000,context)
         apiServices = HttpDownManager.getApiService(ApiServices::class.java!!)
+
+        var ss = HttpUploadManager.httpInit(baseUrl,60000,context)
+        httpUpload = HttpUploadManager.getApiService(ApiServices::class.java)
     }
 
     fun test(){
@@ -123,6 +130,29 @@ var baseUrl = "http://192.168.0.48:8080/"
         return testhttp
     }
 
+    fun test22(url:String,part: MultipartBody.Part){
+        val testhttp = HttpUploadManager.start(httpUpload!!.uplodFiles(url,part),object : HttpSubscribers<Long>(){
+            override fun requestSubscribe(d: Disposable) {
+                Log.i(TAG,"HttpUploadManager requestSubscribe")
+            }
+
+            override fun requestSuccee(t: Long) {
+                Log.i(TAG,"HttpUploadManager requestSuccee")
+            }
+
+            override fun requestFail(e: ApiException) {
+                Log.i(TAG,"HttpUploadManager requestFail")
+            }
+
+            override fun requestComplete() {
+                Log.i(TAG,"HttpUploadManager requestComplete")
+            }
+
+            override fun requestProgress(read: Long, count: Long, done: Boolean) {
+                Log.i(TAG,"HttpUploadManager requestProgress")
+            }
+        })
+    }
 
 
     fun pause(downFileInfo: DownFileInfo){
