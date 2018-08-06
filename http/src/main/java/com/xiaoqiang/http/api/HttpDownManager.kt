@@ -107,7 +107,6 @@ object HttpDownManager {
      */
     @Throws
     fun  writeFile(responseBody: ResponseBody, url: String,reDown: Boolean) : Long{
-
         //获取文件总长度
         val allLength: Long = responseBody.contentLength()
         var downFileInfo = map.get(url)!!
