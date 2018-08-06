@@ -63,17 +63,17 @@ object HttpDownManager {
         return client!!.create(service)
     }
 
-    fun httpInit(baseUrl : String, connectTimeout : Long, context: Context) : Retrofit?{
+    fun httpInit(baseUrl : String, connectTimeout : Long) : Retrofit?{
         Log.i(TAG,"HttpManager init")
 
         val httpLoggingInterceptor = HttpLoggingInterceptor()
         httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
-        //缓存文件夹
-        val cacheFile = File(context.getExternalCacheDir().toString(), "cache")
-        //缓存大小为10M
-        val cacheSize = 10 * 1024 * 1024L
-        //创建缓存对象
-        val cache = Cache(cacheFile, cacheSize)
+//        //缓存文件夹
+//        val cacheFile = File(context.getExternalCacheDir().toString(), "cache")
+//        //缓存大小为10M
+//        val cacheSize = 10 * 1024 * 1024L
+//        //创建缓存对象
+//        val cache = Cache(cacheFile, cacheSize)
         val okHttpClient = OkHttpClient.Builder()
                 .addInterceptor(object : Interceptor{
                     override fun intercept(chain: Interceptor.Chain?): Response {
