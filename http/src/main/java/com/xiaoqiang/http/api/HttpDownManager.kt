@@ -82,13 +82,14 @@ object HttpDownManager {
 //                        Log.i(TAG,"downFileInfo.readLength:${downFileInfo!!.readLength}\n${chain!!.request().url().uri().toString()}")
                         val request = chain!!.request().newBuilder().addHeader("Range", "bytes=${downFileInfo!!.readLength}-").build()//startpos 就是数据库记录的已经下载的大小
                         val originalResponse = chain.proceed(request)
+                        Log.i(TAG,"downFileInfo.intercept.....")
                         return originalResponse.newBuilder().build()
                     }
                 })
                 .connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
                 .writeTimeout(connectTimeout, TimeUnit.MILLISECONDS)
                 .readTimeout(connectTimeout, TimeUnit.MILLISECONDS)
-                .cache(cache)
+//                .cache(cache)
                 .build()
 
         client = Retrofit.Builder()
