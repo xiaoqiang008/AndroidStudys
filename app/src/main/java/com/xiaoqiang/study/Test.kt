@@ -45,7 +45,7 @@ var baseUrl = "http://api.school.jxjt.me"
         HttpManager.httpInit(baseUrl,10000)
         http = HttpManager.getApiService(ApiServices::class.java!!)
 
-        var retrofit =  HttpDownManager.httpInit(baseUrl,600000,context)
+        var retrofit =  HttpDownManager.httpInit(baseUrl,600000)
         apiServices = HttpDownManager.getApiService(ApiServices::class.java!!)
 
         var ss = HttpUploadManager.httpInit(baseUrl,60000,context)
