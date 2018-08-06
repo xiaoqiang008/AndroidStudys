@@ -44,7 +44,7 @@ object HttpDownManager {
             Log.i(TAG,"setBaseApi no in")
             map.put(downFileInfo.url,downFileInfo)
         }
-        Log.i(TAG,"start.downFileInfo:${map.toString()}")
+//        Log.i(TAG,"start.downFileInfo:${map.toString()}")
         observable
                 /*http请求线程*/
                 .subscribeOn(Schedulers.io())//请求网络 在调度者的io线程
@@ -79,7 +79,7 @@ object HttpDownManager {
                     override fun intercept(chain: Interceptor.Chain?): Response {
                         var downFileInfo = map.get(chain!!.request().url().uri().toString())
                         Log.i(TAG,"downFileInfo.intercept:${map.toString()}")
-                        Log.i(TAG,"downFileInfo.readLength:${downFileInfo!!.readLength}\n${chain!!.request().url().uri().toString()}")
+//                        Log.i(TAG,"downFileInfo.readLength:${downFileInfo!!.readLength}\n${chain!!.request().url().uri().toString()}")
                         val request = chain!!.request().newBuilder().addHeader("Range", "bytes=${downFileInfo!!.readLength}-").build()//startpos 就是数据库记录的已经下载的大小
                         val originalResponse = chain.proceed(request)
                         return originalResponse.newBuilder().build()
